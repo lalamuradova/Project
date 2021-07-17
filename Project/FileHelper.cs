@@ -81,7 +81,7 @@ namespace Project
                 }
             }
         }
-        public void JsonDeserializeWorker()
+        public void JsonDeserializeWorker(Database db)
         {
             Worker[] workers = null;
             var serializer = new JsonSerializer();
@@ -92,10 +92,10 @@ namespace Project
                 {
                     workers = serializer.Deserialize<Worker[]>(jr);
                 }
-                //add.database
-                foreach (var item in workers)
+               
+                foreach (var worker in workers)
                 {
-                    item.ShowWorker();
+                    db.AddWorker(worker);
                 }
             }
 
@@ -113,7 +113,7 @@ namespace Project
                 }
             }
         }
-        public void JsonDeserializeEmployer()
+        public void JsonDeserializeEmployer(Database db)
         {
             Employer[] employers = null;
             var serializer = new JsonSerializer();
@@ -124,16 +124,48 @@ namespace Project
                 {
                     employers = serializer.Deserialize<Employer[]>(jr);
                 }
-                //add.database
-                foreach (var item in employers)
+                
+                foreach (var employer in employers)
                 {
-                    item.Show();
+                    db.AddEmployer(employer);
                 }
             }
 
         }
 
-        public void StreamWriter(string text)
+        public void JsonSerializationJoin(List<Join> users)
+        {
+            var serializer = new JsonSerializer();
+            using (var sw = new StreamWriter("Join.json"))
+            {
+                using (var jw = new JsonTextWriter(sw))
+                {
+                    jw.Formatting = Newtonsoft.Json.Formatting.Indented;
+                    serializer.Serialize(jw, users);
+                }
+            }
+        }
+        public void JsonDeserializeJoin(Database db)
+        {
+            Join[] users = null;
+            var serializer = new JsonSerializer();
+
+            using (StreamReader sr = new StreamReader("Join.json"))
+            {
+                using (var jr = new JsonTextReader(sr))
+                {
+                    users = serializer.Deserialize<Join[]>(jr);
+                }
+                
+                foreach (var user in users)
+                {
+                    db.AddUser(user);
+                }
+            }
+
+        }
+
+        public void StreamWriterLogs(string text)
         {
             using (FileStream fs = new FileStream("Log.txt", FileMode.Append,FileAccess.Write))
             {
@@ -143,8 +175,7 @@ namespace Project
                 }
             }
         }
-
-        public void StreamReader()
+        public void StreamReaderLogs()
         {
             using (var fs = new FileStream("Log.txt", FileMode.OpenOrCreate))
             {

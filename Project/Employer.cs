@@ -70,6 +70,10 @@ Salary: {Salary}");
         {
             Vacancies.Add(vacancy);
         }
+        public void RemoveVacancy(Vacancy v)
+        {
+            Vacancies.Remove(v);
+        }
         public void Show()
         {
             foreach (var vacancy in Vacancies)
