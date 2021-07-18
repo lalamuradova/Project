@@ -46,21 +46,23 @@ namespace Project
     class Run
     {
         public Database DB { get; set; }
+        public FileHelper FH { get; set; }
         public Run()
         {
             DB = new Database();
+            FH = new FileHelper();
         }
         public void Creat()
         {
-            FileHelper fh = new FileHelper();
-            fh.JsonDeserializeWorker(DB);
-            fh.JsonDeserializeEmployer(DB);
-            fh.JsonDeserializeJoin(DB);
+            
+            FH.JsonDeserializeWorker(DB);
+            FH.JsonDeserializeEmployer(DB);
+            FH.JsonDeserializeJoin(DB);
             Display1();
 
-            //fh.JsonSerializationEmployer(DB.Employers);
-            //fh.JsonSerializationWorker(DB.Workers);
-            //fh.JsonSerializationJoin(DB.Users);
+            FH.JsonSerializationEmployer(DB.Employers);
+            FH.JsonSerializationWorker(DB.Workers);
+            FH.JsonSerializationJoin(DB.Users);
         }
         public void Display1()
         {
@@ -76,15 +78,18 @@ namespace Project
             string c = Console.ReadLine();
             Console.Clear();
             if (c == "1")
-            {
-                Display2Sign();
+            { 
+                FH.StreamWriterLogs("User choose sign in");
+                Display2Sign();               
             }
             else if (c == "2")
-            {
-                Display2Join();
+            { 
+                FH.StreamWriterLogs("User choose join in");
+                Display2Join();               
             }
             else
             {
+                FH.StreamWriterLogs("User choose incorrect number");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Incorrect entered. Please choose 1 or 2...");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -194,7 +199,7 @@ namespace Project
                     ++count;
                 }
             }
-            if (count == 0)
+            if (count != 0)
             {
                 return true;
             }
@@ -208,22 +213,30 @@ namespace Project
                                      
                                 [1] WORKER
                                 [2] Employer
+                                [0] Back
                                 Choose: ");
 
             string ch = Console.ReadLine();
             Console.Clear();
             if (ch == "1")
             {
+                FH.StreamWriterLogs("User choose Worker.");
                 Display3Worker();
             }
             else if (ch == "2")
             {
-               var emp= ControlEmployer();
+                FH.StreamWriterLogs("User choose Employer.");
+                var emp= ControlEmployer();
                 if (emp == false)
                 {
+                    FH.StreamWriterLogs("The employer entered the latest information.");
                     CreatEmployer();
                 }
                 Display3Employer();
+            }
+            else if (ch == "0")
+            {
+                Display1();
             }
             else
             {
@@ -244,16 +257,19 @@ namespace Project
 
             if (ch == "1")
             {
+                FH.StreamWriterLogs("The worker looked at the vacancies");
                 ShowVacansy();
                 WorkerChoise();
             }
             else if (ch == "2")
             {
+                FH.StreamWriterLogs("The worker searched at the vacancies");
                 Search();
                 WorkerChoise();
             }
             else if (ch == "0")
             {
+                FH.StreamWriterLogs("The worker choosed back");
                 Display3();
             }
             else
@@ -280,6 +296,7 @@ namespace Project
             }
             else
             {
+                FH.StreamWriterLogs("Worker applied for the vacancy");
                 ApplyVacansy(choise);
             }
         }       
@@ -337,13 +354,16 @@ namespace Project
                 Email = email
             };
             DB.AddWorker(worker);
-
+            
+            string t = vacancy.Speciality;
+            string text = "You have an application for " + t;
             Nofication nofication = new Nofication
             {
-                Text = $"You have an application for {vacancy}",
+                Text =text,
                 Worker=worker
             };
             employer.AddNotification(nofication);
+              FH.StreamWriterLogs("The notification is gone.");
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Your application has been accepted. Thanks...");
@@ -377,22 +397,28 @@ namespace Project
 
             if (ch == "1")
             {
+                FH.StreamWriterLogs("Employer looked at vacancies");
                 ShowVacansy();
+                Back3();
             }
             else if (ch == "2")
             {
+                FH.StreamWriterLogs("Employer looked at vacancies of yours shared");
                 ShowYourVacansy();
             }
             else if (ch == "3")
             {
+                FH.StreamWriterLogs("Employer created vacancies");
                 CreatVacansy();
             }
             else if (ch == "4")
             {
-                Search();
+                FH.StreamWriterLogs("Employer searched at vacancies");
+                Search2();
             }
             else if (ch == "5")
             {
+                FH.StreamWriterLogs("Employer looked at notifications");
                 ShowNotification();
             }
             else if (ch == "0")
@@ -407,6 +433,7 @@ namespace Project
                 Display3Employer();
             }
         }
+        
         public void CreatEmployer()
         {
             Console.Write("Name: ");
@@ -436,27 +463,56 @@ namespace Project
                     var not = emp[i].Nofications;
                     for (int k = 0; k < not.Count; k++)
                     {
-                        Console.Write($"[{k}] ");
+                        Console.Write($"[{k+1}] ");
                         emp[i].ShowNotifications();
+                        Console.WriteLine("\n");
                     }
                     Console.Write("Choose: ");
                     string ch = Console.ReadLine();
                     int index = int.Parse(ch);
                     Console.Clear();
-                    emp[i].Nofications[index].Worker.ShowWorker();
-                    ChoiseNotification();
+                    var worker = emp[i].Nofications[index - 1].Worker;
+                    worker.ShowWorker();
+                    var email = worker.Email;
+                    FH.StreamWriterLogs("Employer choosed at notification");
+                    ChoiseNotification(email);
                     ++counter;
                 }
             }
             if (counter != 0)
             {
-                BackEmp();
+                Back3();
             }
 
 
         }
-        public void ChoiseNotification()
+        public void ShowCv()
         {
+            FH.StreamWriterLogs("Employer looked at CV");
+            Console.Clear();
+            Console.WriteLine("Show CV [1]");
+            Console.WriteLine("Back    [0]");
+            string ch = Console.ReadLine();
+            Console.Clear();
+            if (ch == "1")
+            {
+                FH.JsonDeserializeCV();
+            }
+            else if (ch == "0")
+            {
+                Display3Employer();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Incorrect entered. Please choose 1 or 0...");
+                Console.ForegroundColor = ConsoleColor.White;
+                ShowCv();
+            }
+        }
+        public void ChoiseNotification(string mail)
+        {
+            ShowCv();
             Console.WriteLine("[1]  Accepted");
             Console.WriteLine("[2] Not Accepted");
             Console.WriteLine("Choose: ");
@@ -465,23 +521,26 @@ namespace Project
 
             if (ch == "1")
             {
-                SendMail();
+                FH.StreamWriterLogs("The Employer accepted the Worker's application");
+                SendMail(mail);
+                FH.StreamWriterLogs("Mail sent for Worker");
                 Console.Write("Back [0] : ");
                 string c = Console.ReadLine();
                 if (c == "0")
                 {
-                    ShowNotification();
+                    Display3Employer();
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Incorrect entered. Please choose 0...");
                     Console.ForegroundColor = ConsoleColor.White;
-                    ChoiseNotification();
+                    ChoiseNotification(mail);
                 }
             }
             else if (ch == "2")
             {
+                FH.StreamWriterLogs("The Employer not accepted the Worker's application");
                 Display3Employer();
             }
             else
@@ -531,13 +590,13 @@ namespace Project
                     emp[i].AddVacancy(vacancy);
                 }
             }
-
-            BackEmp();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("The vacancy was successfully placed...");
+            Console.ForegroundColor = ConsoleColor.White;
+            Back3();
         }
-        public void SendMail()
-        {
-            Console.Write("Enter mail: ");
-            string mail = Console.ReadLine();
+        public void SendMail(string mail)
+        {           
 
             SmtpClient client = new SmtpClient();
             MailMessage message = new MailMessage();
@@ -551,7 +610,7 @@ namespace Project
             message.Body = "Tebrikler muracietiniz testiqlendi. Sabah 09:00-da interview ucun gelmeyiniz xais olunur." ;
             client.Send(message);
             Console.Clear();
-            Console.WriteLine("Score sent\n");            
+            Console.WriteLine("Email sent\n");            
 
         }
         public void ShowYourVacansy()
@@ -564,7 +623,7 @@ namespace Project
                     emp[i].Show();
                 }
             }
-            BackEmp();
+            Back3();
         }
         public void ShowVacansy()
         {
@@ -675,6 +734,142 @@ namespace Project
                 Search();
             }
         }
+        public void Search2()
+        {
+            Console.WriteLine("[1] Search by Salary");
+            Console.WriteLine("[2] Search by City");
+            Console.WriteLine("[3] Search by Company name");
+            Console.WriteLine("[0] Back");
+            Console.Write("Choose: ");
+            string ch = Console.ReadLine();
+            List<Vacancy> vacancies = new List<Vacancy>();
+
+            for (int i = 0; i < DB.Employers.Count; i++)
+            {
+                for (int k = 0; k < DB.Employers[i].Vacancies.Count; k++)
+                {
+                    vacancies.Add(DB.Employers[i].Vacancies[k]);
+                }
+            }
+            Console.Clear();
+
+            if (ch == "1")
+            {
+
+                Console.Write("Enter salary: ");
+                string s = Console.ReadLine();
+                int salary = int.Parse(s);
+                if (salary > 0 && salary <= 10000)
+                {
+                    var list = vacancies.Where(d => d.Salary >= salary);
+                    if (list == null)
+                    {
+                        foreach (var item in list)
+                        {
+                            item.ShowVacancy();
+                        }
+                        Search2();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not found");
+                        Back2();
+                    }
+                }
+                else
+                {
+                    throw new Exception("Salary must be number...");
+                }
+
+            }
+            else if (ch == "2")
+            {
+                Console.Write("Enter city: ");
+                string city = Console.ReadLine();
+
+                var list = vacancies.Where(d => d.City.Contains(city));
+                if (list != null)
+                {
+                    foreach (var item in list)
+                    {
+                        item.ShowVacancy();
+                    }
+                    Search2();
+                }
+                else
+                {
+                    Console.WriteLine("Not found");
+                    Back2();
+                }
+            }
+            else if (ch == "3")
+            {
+                Console.Write("Enter Company name: ");
+                string name = Console.ReadLine();
+
+                var list = vacancies.FindAll(v => v.CompanyName.Contains(name));
+                if (list != null)
+                {
+                    foreach (var item in list)
+                    {
+                        item.ShowVacancy();
+                    }
+                    Search2();
+                }
+                else
+                {
+                    Console.WriteLine("Not found");
+                    Back2();
+                }
+            }
+            else if (ch == "0")
+            {
+                Display3Employer();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Incorrect entered...");
+                Console.ForegroundColor = ConsoleColor.White;
+                Search2();
+            }
+        }
+        public void Back2()
+        {
+            Console.WriteLine("[0] Back");
+
+            string ch = Console.ReadLine();
+            if (ch == "0")
+            {
+                Display3Employer();
+            }
+            else
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Incorrect entered. Please choose 0...");
+                Console.ForegroundColor = ConsoleColor.White;
+                Search2();
+            }
+        }
+        public void Back3()
+        {
+            Console.WriteLine("[0] Back");
+
+            string c = Console.ReadLine();
+            Console.Clear();
+            if (c == "0")
+            {
+                Display3Employer();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Incorrect entered. Please choose 1 or 2...");
+                Console.ForegroundColor = ConsoleColor.White;
+                Display3Employer();
+            }
+        }
         public void BackEmp()
         {
             Console.WriteLine("[0] Back");
@@ -688,7 +883,7 @@ namespace Project
             {
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Incorrect entered. Please choose 1 or 2...");
+                Console.WriteLine("Incorrect entered. Please choose 0...");
                 Console.ForegroundColor = ConsoleColor.White;
                 ShowVacansy();
             }
