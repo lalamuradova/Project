@@ -12,13 +12,17 @@ namespace Project
     {
         static void Main(string[] args)
         {
-            FileHelper fh = new FileHelper();
+            Run run = new Run();
 
-            
-            
+            try
+            {
+                run.Creat();
+            }
+            catch (Exception ex)
+            {
 
-
-
+                Console.WriteLine(ex);
+            }
 
         }
 

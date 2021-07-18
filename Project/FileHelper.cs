@@ -83,22 +83,22 @@ namespace Project
         }
         public void JsonDeserializeWorker(Database db)
         {
-            Worker[] workers = null;
+           List<Worker> workers = null;
             var serializer = new JsonSerializer();
 
             using (StreamReader sr = new StreamReader("Worker.json"))
             {
                 using (var jr = new JsonTextReader(sr))
                 {
-                    workers = serializer.Deserialize<Worker[]>(jr);
+                    workers = serializer.Deserialize<List<Worker>>(jr);
                 }
-               
                 foreach (var worker in workers)
                 {
                     db.AddWorker(worker);
                 }
             }
 
+            
         }
 
         public void JsonSerializationEmployer(List<Employer> employers)
@@ -115,14 +115,14 @@ namespace Project
         }
         public void JsonDeserializeEmployer(Database db)
         {
-            Employer[] employers = null;
+            List<Employer> employers = null;
             var serializer = new JsonSerializer();
 
             using (StreamReader sr = new StreamReader("Employer.json"))
             {
                 using (var jr = new JsonTextReader(sr))
                 {
-                    employers = serializer.Deserialize<Employer[]>(jr);
+                    employers = serializer.Deserialize<List<Employer>>(jr);
                 }
                 
                 foreach (var employer in employers)
@@ -147,14 +147,14 @@ namespace Project
         }
         public void JsonDeserializeJoin(Database db)
         {
-            Join[] users = null;
+            List<Join> users = null;
             var serializer = new JsonSerializer();
 
             using (StreamReader sr = new StreamReader("Join.json"))
             {
                 using (var jr = new JsonTextReader(sr))
                 {
-                    users = serializer.Deserialize<Join[]>(jr);
+                    users = serializer.Deserialize<List<Join>>(jr);
                 }
                 
                 foreach (var user in users)
