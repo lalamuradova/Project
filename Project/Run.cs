@@ -55,10 +55,16 @@ namespace Project
         }
         public void Creat()
         {
-            if((File.Exists("Worker.json")) && (File.Exists("Employer.json"))&& (File.Exists("Join.json")))
+            if (File.Exists("Worker.json"))
             {
                 FH.JsonDeserializeWorker(DB);
+            }
+            else if (File.Exists("Employer.json"))
+            {
                 FH.JsonDeserializeEmployer(DB);
+            }
+            else if (File.Exists("Join.json"))
+            {            
                 FH.JsonDeserializeJoin(DB);
             }            
 
@@ -454,6 +460,7 @@ namespace Project
                 Phone = phone,
                 Username = DB.Username
             };
+            DB.AddEmployer(employer);
             Console.Clear();
         }
         public void ShowNotification()
