@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -54,10 +55,13 @@ namespace Project
         }
         public void Creat()
         {
-            
-            FH.JsonDeserializeWorker(DB);
-            FH.JsonDeserializeEmployer(DB);
-            FH.JsonDeserializeJoin(DB);
+            if((File.Exists("Worker.json")) && (File.Exists("Employer.json"))&& (File.Exists("Join.json")))
+            {
+                FH.JsonDeserializeWorker(DB);
+                FH.JsonDeserializeEmployer(DB);
+                FH.JsonDeserializeJoin(DB);
+            }            
+
             Display1();
 
             FH.JsonSerializationEmployer(DB.Employers);
