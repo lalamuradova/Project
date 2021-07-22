@@ -21,8 +21,7 @@ namespace Project
         public string Username { get; set; }
         public string Password { get; set; }
         
-    }
-   
+    }  
     class Database
     {
         public List<Employer> Employers { get; set; } = new List<Employer>();
@@ -66,7 +65,102 @@ namespace Project
             else if (File.Exists("Join.json"))
             {            
                 FH.JsonDeserializeJoin(DB);
-            }            
+            }
+            else
+            {
+                Worker worker = new Worker()
+                {
+                    Name = "Lala",
+                    Surname = "Muradova",
+                    City = "Baki",
+                    Phone = "0779876543",
+                    Age = 26,
+                    Email = "lalamuradova2017@gmail.com"
+                };
+                Worker worker2 = new Worker()
+                {
+                    Name = "Nura",
+                    Surname = "Cabbarova",
+                    City = "Baki",
+                    Phone = "0223334445",
+                    Age = 21,
+                    Email = "Nura@gmail.com"
+                };
+                List<Worker> workers = new List<Worker>();
+                workers.Add(worker);
+                workers.Add(worker2);
+                FH.JsonSerializationWorker(workers);
+
+                Vacancy vacancy1 = new Vacancy
+                {
+                    CompanyName = "Qscepter LLC",
+                    Speciality = "FULL STACK PHP PROQRAMCI",
+                    Requirements = "- Proqramlaşdırma uzre en azı +5 il is tecrubesi olan - MySQL,JSON,Git,Linux",
+                    WorkTime = "Bazar ertesi-Cume (10:00-dan 18:00-dək) - Senbe(10:00 - dan 13:00 - dek) ",
+                    Age = "24 - 40",
+                    City = "Baki",
+                    Salary = 1200
+                };
+                Vacancy vacancy2 = new Vacancy
+                {
+                    CompanyName = "İrşad",
+                    Speciality = "SAYT UZRE MUTEXESSİS",
+                    Requirements = "30-yaşa kimi bey namizedler ,İs tecrubesi - 2 il, Photoshop proqrami uzre mukemmel bilik ",
+                    WorkTime = "Bazar ertesi - Senbe(10:00 - dan 19:00 - dek) ",
+                    Age = "23 - 30",
+                    City = "Baki",
+                    Salary = 500
+                };
+                Vacancy vacancy3 = new Vacancy
+                {
+                    CompanyName = "Miner AZ",
+                    Speciality = "LİSP PROQRAMCI",
+                    Requirements = "Java / Python guclu alqoritmik bacariqlari, Menbeli ve ya ticaret Lisp layihelerinde istirak ",
+                    WorkTime = "Bazar ertesi - Senbe(09:00 - dan 18:00 - dek) ",
+                    Age = "20 - 36",
+                    City = "Baki",
+                    Salary = 5000
+                };
+                Join join1 = new Join
+                {
+                    Username = "Worker",
+                    Password = "worker1234"
+                };
+                Join join2 = new Join
+                {
+                    Username = "Admin",
+                    Password = "adminadmin"
+                };
+                List<Join> joins = new List<Join>();
+                joins.Add(join1);
+                joins.Add(join2);
+                FH.JsonSerializationJoin(joins);
+                Employer employer = new Employer
+                {
+                    Name = "Nermin",
+                    Surname = "Hesenzade",
+                    Phone = "1234567",
+                    Username = join1.Username
+                };
+                employer.AddVacancy(vacancy1);
+                employer.AddVacancy(vacancy2);
+
+
+                Employer employer2 = new Employer
+                {
+                    Name = "Aynur",
+                    Surname = "Novruzova",
+                    Phone = "0987654321",
+                    Username = join2.Username
+                };
+                employer2.AddVacancy(vacancy3);
+
+                List<Employer> employers = new List<Employer>();
+                employers.Add(employer);
+                employers.Add(employer2);
+
+                FH.JsonSerializationEmployer(employers);
+            }
 
             Display1();
 
@@ -442,8 +536,7 @@ namespace Project
                 Console.ForegroundColor = ConsoleColor.White;
                 Display3Employer();
             }
-        }
-        
+        }        
         public void CreatEmployer()
         {
             Console.Write("Name: ");
