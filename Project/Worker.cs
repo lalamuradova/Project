@@ -10,7 +10,7 @@ namespace Project
     class Worker
     {
         public Worker() { Id = ++MyId; }
-        public Worker(string name, string surname, string city, string phone, int age, string email)
+        public Worker(string name, string surname, string city, string phone, int age, string email,string username,CV cV)
         {
             Id = ++MyId;
             Name = name;
@@ -19,6 +19,8 @@ namespace Project
             Phone = phone;
             Age = age;
             Email = email;
+            Username = username;
+            cv = cV;
         }
 
         public int Id { get; set; }
@@ -29,7 +31,8 @@ namespace Project
         public string Phone { get; set; }
         public int Age { get; set; }
         public string Email { get; set; }
-        
+        public string Username { get; set; }
+        public CV cv { get; set; }
         public void ShowWorker()
         {
             Console.WriteLine($@"Fullname: {Name} {Surname}
@@ -38,6 +41,7 @@ Age: {Age}
 Email: {Email}
 
 ");
+            Console.WriteLine(cv);
         }
 
     }

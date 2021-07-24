@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="CV.cs" />
     <Compile Include="Employer.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="FileHelper.cs" />
     <Compile Include="JoinIn.cs" />
     <Compile Include="Program.cs" />

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Project
@@ -27,6 +28,8 @@ namespace Project
         public List<Employer> Employers { get; set; } = new List<Employer>();
         public List<Worker> Workers { get; set; } = new List<Worker>();
         public List<Join> Users { get; set; } = new List<Join>();
+        public List<CV> CVs { get; set; } = new List<CV>();
+
         public string Username { get; set; }       
         public Database() { }
         public void AddEmployer(Employer employer)
@@ -41,7 +44,10 @@ namespace Project
         {
             Users.Add(user);
         }
-       
+        public void AddCV(CV cv)
+        {
+            CVs.Add(cv);
+        }
     }
     class Run
     {
@@ -58,16 +64,83 @@ namespace Project
             {
                 FH.JsonDeserializeWorker(DB);
             }
-            else if (File.Exists("Employer.json"))
+            if (File.Exists("Employer.json"))
             {
                 FH.JsonDeserializeEmployer(DB);
             }
-            else if (File.Exists("Join.json"))
+            if (File.Exists("Join.json"))
             {            
                 FH.JsonDeserializeJoin(DB);
             }
+            if (File.Exists("CV.json"))
+            {
+                FH.JsonDeserializeCV(DB);
+            }
             else
             {
+                CV cv1 = new CV
+                {
+                    Specialty = "Komputer Elmleri",
+                    University = "Azerbaycan Dovlet Neft ve Senaye Universiteti",
+                    AdmissionScore = 470,
+                    Skills = "C++ , C#",
+                    HonorsDiploma = "Yox",
+                    GITLINK = "https://github.com/lalamuradova",
+                    LINKEDIN = "https://www.linkedin.com/in/lala-mamedova-253579217/"
+                };
+                Language lang1 = new Language
+                {
+                    Name = "Ingilis dili",
+                    Level = "Orta"
+                };
+                Language lang2 = new Language
+                {
+                    Name = "Rus dili",
+                    Level = "Baslangic"
+                };
+                Company company1 = new Company
+                {
+                    Name = "Azerbaijan Milli Elmler Akademiyasi",
+                    StartTime = new DateTime(2015, 3, 1),
+                    EndTime = "Davam edir"
+                };
+                cv1.AddCompany(company1);
+                cv1.AddLanguage(lang1);
+                cv1.AddLanguage(lang2);
+
+                CV cv2 = new CV
+                {
+                    Specialty = "Komputer Muhendisliyi",
+                    University = "Azerbaycan Dovlet Neft ve Senaye Universiteti",
+                    AdmissionScore = 650,
+                    Skills = "C++ , C#, Java",
+                    HonorsDiploma = "Yox",
+                    GITLINK = "https://github.com/lalamuradova",
+                    LINKEDIN = "https://www.linkedin.com/in/lala-mamedova-253579217/"
+                };
+                
+                Language lang = new Language
+                {
+                    Name = "Rus dili",
+                    Level = "Baslangic"
+                };
+                Company company2 = new Company
+                {
+                    Name = "Azerbaijan Milli Elmler Akademiyasi",
+                    StartTime = new DateTime(2015, 3, 1),
+                    EndTime = "Davam edir"
+                };
+                cv2.AddCompany(company2);
+                cv2.AddLanguage(lang);
+
+                DB.AddCV(cv1);
+                DB.AddCV(cv2);
+
+                List<CV> cvs = new List<CV>();
+                cvs.Add(cv1);
+                cvs.Add(cv2);
+                FH.JsonSerializationCV(cvs);
+
                 Worker worker = new Worker()
                 {
                     Name = "Lala",
@@ -75,7 +148,9 @@ namespace Project
                     City = "Baki",
                     Phone = "0779876543",
                     Age = 26,
-                    Email = "lalamuradova2017@gmail.com"
+                    Email = "lalamuradova2017@gmail.com",
+                    Username= "Worker",
+                    cv =cv1
                 };
                 Worker worker2 = new Worker()
                 {
@@ -84,11 +159,16 @@ namespace Project
                     City = "Baki",
                     Phone = "0223334445",
                     Age = 21,
-                    Email = "Nura@gmail.com"
+                    Email = "Nura@gmail.com",
+                    Username= "Worker",
+                    cv = cv2
                 };
                 List<Worker> workers = new List<Worker>();
                 workers.Add(worker);
                 workers.Add(worker2);
+                
+                DB.AddWorker(worker);
+                DB.AddWorker(worker2);
                 FH.JsonSerializationWorker(workers);
 
                 Vacancy vacancy1 = new Vacancy
@@ -131,10 +211,13 @@ namespace Project
                     Username = "Admin",
                     Password = "adminadmin"
                 };
+                DB.AddUser(join2);
+                DB.AddUser(join1);
                 List<Join> joins = new List<Join>();
                 joins.Add(join1);
                 joins.Add(join2);
                 FH.JsonSerializationJoin(joins);
+
                 Employer employer = new Employer
                 {
                     Name = "Nermin",
@@ -155,18 +238,19 @@ namespace Project
                 };
                 employer2.AddVacancy(vacancy3);
 
+                DB.AddEmployer(employer);
+                DB.AddEmployer(employer2);
+
                 List<Employer> employers = new List<Employer>();
                 employers.Add(employer);
                 employers.Add(employer2);
 
                 FH.JsonSerializationEmployer(employers);
+
             }
 
             Display1();
-
-            FH.JsonSerializationEmployer(DB.Employers);
-            FH.JsonSerializationWorker(DB.Workers);
-            FH.JsonSerializationJoin(DB.Users);
+           
         }
         public void Display1()
         {
@@ -176,7 +260,7 @@ namespace Project
 
                                     ----------------------------------------------
                                                    Sign in [1]
-                                                   Join in [2]
+                                                   Sign up [2]
                                     ----------------------------------------------");
 
             string c = Console.ReadLine();
@@ -188,7 +272,7 @@ namespace Project
             }
             else if (c == "2")
             { 
-                FH.StreamWriterLogs("User choose join in");
+                FH.StreamWriterLogs("User choose sign up");
                 Display2Join();               
             }
             else
@@ -238,7 +322,7 @@ namespace Project
  
                               Username or password is not correct 
                               Back    [0]
-                              Join in [1]
+                              Sign up [1]
                               Choose: ");
             Console.ForegroundColor = ConsoleColor.White;
             string ch = Console.ReadLine();
@@ -266,7 +350,12 @@ namespace Project
                    
                             Enter Username: ");
             string username = Console.ReadLine();
-            
+            if (username.Length < 4) 
+            {
+                Console.Clear();
+                Console.WriteLine("Username must be more than 4 characters...");
+                Display2Join();
+            }
             Console.Clear();
             for (int i = 0; i < DB.Users.Count; i++)
             {
@@ -282,12 +371,19 @@ namespace Project
                    
                             Enter Password: ");
             string password = Console.ReadLine();
+            if (password.Length < 4)
+            {
+                Console.Clear();
+                Console.WriteLine("Password must be more than 4 characters...");
+                Display2Join();
+            }
             Join j = new Join
             {
                 Username = username,
                 Password = password
             };
-            DB.AddUser(j);
+            DB.AddUser(j);            
+            FH.JsonSerializationJoin(DB.Users);
             Console.Clear();
             Console.WriteLine("The registration was successful...");
             Display2Sign();
@@ -299,6 +395,23 @@ namespace Project
             for (int i = 0; i < emp.Count; i++)
             {
                 if (emp[i].Username == DB.Username)
+                {
+                    ++count;
+                }
+            }
+            if (count != 0)
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool ControlWorker()
+        {
+            var worker = DB.Workers;
+            int count = 0;
+            for (int i = 0; i < worker.Count; i++)
+            {
+                if (worker[i].Username == DB.Username)
                 {
                     ++count;
                 }
@@ -325,7 +438,14 @@ namespace Project
             if (ch == "1")
             {
                 FH.StreamWriterLogs("User choose Worker.");
-                Display3Worker();
+                var w = ControlWorker();
+                if (w == false)
+                {
+                    FH.StreamWriterLogs("The worker entered the latest information.");
+                    CreatWorker();
+                }
+                Display3Worker();                
+                
             }
             else if (ch == "2")
             {
@@ -389,7 +509,7 @@ namespace Project
         {
             Console.WriteLine("Back [0]");
             Console.WriteLine("Apply for a vacancy (Id)  ");
-            Console.Write("Choose Id or 0: ");
+            Console.Write("Choose Id or Back(0) : ");
             string ch = Console.ReadLine();
             int choise = int.Parse(ch);
             Console.Clear();
@@ -430,35 +550,251 @@ namespace Project
                 Display3Worker();
             }
         }
-        public void Apply(Vacancy vacancy, Employer employer)
-        {          
-
+        public void CreatWorker()
+        {
             Console.WriteLine("Write your information for the apply.");
             Console.Write("Name: ");
             string name = Console.ReadLine();
+            
             Console.Write("Surname: ");
             string surname = Console.ReadLine();
+
             Console.Write("City: ");
             string city = Console.ReadLine();
-            Console.Write("Phone: ");
-            string phone = Console.ReadLine();
+
+            if (name.Length < 4 || surname.Length < 4 || city.Length < 4) 
+            {
+                Console.Clear();
+                Console.WriteLine("Name, surname and city must be more than 4 characters...");
+                CreatWorker();
+            }
+            
             Console.Write("Age: ");
             string a = Console.ReadLine();
-            int age = int.Parse(a);
+            int age = 0;
+            try
+            {
+                 age = int.Parse(a);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Cannot be letter");
+                Console.Write("Age: ");
+                string ag = Console.ReadLine();
+                age = int.Parse(ag);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(
+                    $"Unexpected error:  { exception.Message }");
+            }
+
             Console.Write("Email: ");
             string email = Console.ReadLine();
 
+            try
+            {                
+                Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                Match match = regex.Match(email);
+                if (!match.Success)
+                {
+                    throw new EmailFormatException();
+                }                
+            }
+            catch (EmailFormatException text)
+            {
+                Console.WriteLine(text.Message);
+            }
+            
+
+            var Cv = CreatCv();
             Worker worker = new Worker
             {
                 Name = name,
                 Surname = surname,
                 City = city,
-                Phone = phone,
+                Phone = "055-788-88-88",
                 Age = age,
-                Email = email
+                Email = email,
+                Username = DB.Username,
+                cv = Cv
             };
-            DB.AddWorker(worker);
             
+            DB.AddWorker(worker);
+            FH.JsonSerializationWorker(DB.Workers);
+
+            Console.Clear();
+        }
+        public CV CreatCv()
+        {
+            Console.Write("Speciality: ");
+            string speciality = Console.ReadLine();
+            Console.Write("University: ");
+            string university = Console.ReadLine();
+            Console.Write("AdmissionScore: ");
+            string s = Console.ReadLine();         
+            
+            int score = 0;
+            try
+            {
+                score = int.Parse(s);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Cannot be letter");
+                Console.Write("Score: ");
+                string sc = Console.ReadLine();
+                score = int.Parse(sc);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(
+                    $"Unexpected error:  { exception.Message }");
+            }
+
+            Console.Write("Skills: ");
+            string skills = Console.ReadLine();           
+
+            CV cv = new CV
+            {
+                Specialty = speciality,
+                University = university,
+                AdmissionScore = score,
+                Skills = skills,
+                GITLINK = "https://github.com/huiu",
+                LINKEDIN = "https://www.linkedin.com/in/k-mjiii-253579217/"
+            };
+            string lang = string.Empty;
+            string level = string.Empty;
+            int counter = 0;
+            while (counter<3)
+            {
+                Console.Write(@"Language:
+[1] English   [2] Russian  [3] Italian
+Choose: ");
+                 lang = Console.ReadLine();
+
+                Console.Write(@"Level:
+[1] Begginer  [2] Intermediate [3] Professional
+Choose:");
+                level = Console.ReadLine();
+
+                Console.Write("Add in another language (yes) or (no): ");
+                string add = Console.ReadLine();
+                if (add == "yes")
+                {
+                    ++counter;
+                }
+                else
+                {
+                    counter = 4;
+                }
+            }
+            
+            if (lang == "1")
+            {
+                lang = "English";
+                if (level == "1")
+                {
+                    level = "Beginner";
+
+                }
+                else if (level == "2")
+                {
+                    level = "Intermediate";
+                }
+                else if (level == "3")
+                {
+                    level = "Professional";
+                }
+                Language lang1 = new Language
+                {
+                    Name = lang,
+                    Level = level
+                };
+                cv.AddLanguage(lang1);
+            }
+            else if (lang == "2")
+            {
+                lang = "Russian";
+                
+                if (level == "1")
+                {
+                    level = "Beginner";
+
+                }
+                else if (level == "2")
+                {
+                    level = "Intermediate";
+                }
+                else if (level == "3")
+                {
+                    level = "Professional";
+                }
+                Language lang1 = new Language
+                {
+                    Name = lang,
+                    Level = level
+                };
+
+                cv.AddLanguage(lang1);
+            }
+            else if (lang == "3")
+            {
+                lang = "Italian";
+                
+                if (level == "1")
+                {
+                    level = "Beginner";
+
+                }
+                else if (level == "2")
+                {
+                    level = "Intermediate";
+                }
+                else if (level == "3")
+                {
+                    level = "Professional";
+                }
+                Language lang1 = new Language
+                {
+                    Name = lang,
+                    Level = level
+                };
+
+                cv.AddLanguage(lang1);
+            }
+            else
+            {
+
+            }
+
+            Console.Write("Company name: ");
+            string name = Console.ReadLine();
+            Company company1 = new Company
+            {
+                Name = name,
+                StartTime = new DateTime(2015, 3, 1),
+                EndTime = "Davam edir"
+            };
+            cv.AddCompany(company1);
+
+            DB.AddCV(cv);
+            FH.JsonSerializationCV(DB.CVs);
+            return cv;
+        }
+        public void Apply(Vacancy vacancy, Employer employer)
+        {
+            var w = DB.Workers;
+            Worker worker = new Worker();
+            for (int i = 0; i < w.Count; i++)
+            {
+                if (w[i].Username == DB.Username)
+                {
+                    worker = w[i];
+                }
+            }
+
             string t = vacancy.Speciality;
             string text = "You have an application for " + t;
             Nofication nofication = new Nofication
@@ -467,7 +803,8 @@ namespace Project
                 Worker=worker
             };
             employer.AddNotification(nofication);
-              FH.StreamWriterLogs("The notification is gone.");
+            FH.JsonSerializationEmployer(DB.Employers);
+            FH.StreamWriterLogs("The notification is gone.");
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Your application has been accepted. Thanks...");
@@ -554,6 +891,7 @@ namespace Project
                 Username = DB.Username
             };
             DB.AddEmployer(employer);
+            FH.JsonSerializationEmployer(DB.Employers);
             Console.Clear();
         }
         public void ShowNotification()
@@ -589,34 +927,9 @@ namespace Project
             }
 
 
-        }
-        public void ShowCv()
-        {
-            FH.StreamWriterLogs("Employer looked at CV");
-            Console.Clear();
-            Console.WriteLine("Show CV [1]");
-            Console.WriteLine("Back    [0]");
-            string ch = Console.ReadLine();
-            Console.Clear();
-            if (ch == "1")
-            {
-                FH.JsonDeserializeCV();
-            }
-            else if (ch == "0")
-            {
-                Display3Employer();
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Incorrect entered. Please choose 1 or 0...");
-                Console.ForegroundColor = ConsoleColor.White;
-                ShowCv();
-            }
-        }
+        }       
         public void ChoiseNotification(string mail)
-        {
-            ShowCv();
+        {            
             Console.WriteLine("[1]  Accepted");
             Console.WriteLine("[2] Not Accepted");
             Console.WriteLine("Choose: ");
@@ -626,7 +939,15 @@ namespace Project
             if (ch == "1")
             {
                 FH.StreamWriterLogs("The Employer accepted the Worker's application");
-                SendMail(mail);
+                try
+                {
+                    SendMail(mail);
+                }
+                catch (SmtpException)
+                {
+                    Console.WriteLine("There is a problem with the connection");                   
+                }
+
                 FH.StreamWriterLogs("Mail sent for Worker");
                 Console.Write("Back [0] : ");
                 string c = Console.ReadLine();
@@ -664,16 +985,94 @@ namespace Project
             string speciality = Console.ReadLine();
             Console.Write("Requirements: ");
             string requirements = Console.ReadLine();
-            Console.Write("WorkTime: ");
-            string workTime = Console.ReadLine();
+            Console.Write(@"WorkTime: 
+[1] 09:00 - 18:00
+[2] 10:00 - 19:00
+[3] 09:00 - 14:00
+choose: ");
+            string ch = Console.ReadLine();
+            string workTime = string.Empty;
+            if (ch == "1")
+            {
+                workTime = "09:00 - 18:00-dek";
+            }
+            else if (ch == "2")
+            {
+                workTime = "10:00 - 19:00-dek";
+            }
+            else if (ch == "3")
+            {
+                workTime = "09:00 - 14:00-dek";
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Incorrect entered");
+                CreatVacansy();
+            }
             Console.Write("Age: ");
             string age = Console.ReadLine();
-            Console.Write("City: ");
-            string city = Console.ReadLine();
+            int a = 0;
+            try
+            {
+                a = int.Parse(age);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("age cannot be letter");
+                Console.Write("Age: ");
+                age = Console.ReadLine();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(
+                    $"Unexpected error:  { exception.Message }");
+            }
+            Console.Write(@"City: 
+[1] Baki
+[2] Sumqayit
+[3] Ganca
+choose: ");
+            string chc = Console.ReadLine();
+            string city = string.Empty;
+            if (ch == "1")
+            {
+                workTime = "Baki";
+            }
+            else if (ch == "2")
+            {
+                workTime = "Sumqayit";
+            }
+            else if (ch == "3")
+            {
+                workTime = "Ganca";
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Incorrect entered");
+                CreatVacansy();
+            }
             Console.Write("Salary: ");
             string s = Console.ReadLine();
-            int salary = int.Parse(s);
-
+            int salary = 0;
+            
+            try
+            {
+                salary = int.Parse(s);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Salary cannot be letter");
+                Console.Write("Salary: ");
+                 s = Console.ReadLine();
+                salary = int.Parse(s);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(
+                    $"Unexpected error:  { exception.Message }");
+            }
             Vacancy vacancy = new Vacancy
             {
 
@@ -692,6 +1091,7 @@ namespace Project
                 if (emp[i].Username == DB.Username)
                 {
                     emp[i].AddVacancy(vacancy);
+                    FH.JsonSerializationEmployer(DB.Employers);
                 }
             }
             Console.ForegroundColor = ConsoleColor.Green;

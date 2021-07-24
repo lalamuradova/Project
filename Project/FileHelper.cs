@@ -10,38 +10,8 @@ namespace Project
 {
     class FileHelper
     {
-        public void JsonSerializationCV()
-        {
-            CV cv = new CV
-            {
-                Specialty = "Komputer Elmleri",
-                University = "Azerbaycan Dovlet Neft ve Senaye Universiteti",
-                AdmissionScore = 470,
-                Skills = "C++ , C#",
-                HonorsDiploma = "Yox",
-                GITLINK = "https://github.com/lalamuradova",
-                LINKEDIN = "https://www.linkedin.com/in/lala-mamedova-253579217/"
-            };
-
-            Language lang1 = new Language
-            {
-                Name = "Ingilis dili",
-                Level = "Orta"
-            };
-            Language lang2 = new Language
-            {
-                Name = "Rus dili",
-                Level = "Baslangic"
-            };
-            Company company1 = new Company
-            {
-                Name = "Azerbaijan Milli Elmler Akademiyasi",
-                StartTime = new DateTime(2015, 3, 1),
-                EndTime = "Davam edir"
-            };
-            cv.AddCompany(company1);
-            cv.AddLanguage(lang1);
-            cv.AddLanguage(lang2);
+        public void JsonSerializationCV(List<CV>CVs)
+        {          
 
             var serializer = new JsonSerializer();
             using (var sw = new StreamWriter("CV.json"))
@@ -49,22 +19,25 @@ namespace Project
                 using (var jw = new JsonTextWriter(sw))
                 {
                     jw.Formatting = Newtonsoft.Json.Formatting.Indented;
-                    serializer.Serialize(jw, cv);
+                    serializer.Serialize(jw, CVs);
                 }
             }
         }
-        public void JsonDeserializeCV()
+        public void JsonDeserializeCV(Database db)
         {
-            CV cv = null;
+            List<CV> cvs = null;
             var serializer = new JsonSerializer();
 
             using (StreamReader sr = new StreamReader("CV.json"))
             {
                 using (var jr = new JsonTextReader(sr))
                 {
-                    cv = serializer.Deserialize<CV>(jr);
+                    cvs = serializer.Deserialize<List<CV>>(jr);
+                }
+                foreach (var cv in cvs)
+                {
+                    db.AddCV(cv);
                 }                
-                    Console.WriteLine(cv);                
             }
 
         }

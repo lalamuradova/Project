@@ -88,7 +88,6 @@ Start time: {StartTime.Day} / {StartTime.Month} / {StartTime.Year} - End time: {
 University: {University}
 Speciality: {Specialty}
 Admission Score: {AdmissionScore}
-Honors Diploma: {HonorsDiploma}
 
                   <<<<<<<<<<<<< Skills >>>>>>>>>>>>>>>
 
